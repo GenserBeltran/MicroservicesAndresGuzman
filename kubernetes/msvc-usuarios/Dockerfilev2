@@ -1,0 +1,21 @@
+#Imagen a copiar con SO Linux
+FROM openjdk:17.0.2
+
+#Carpeta de trabajo
+WORKDIR /app/msvc-usuarios
+
+#Copiando el Poom Parent en app
+COPY ./pom.xml /app
+#Copiando carpetas del proyecto al cache una en la raiz
+COPY ./msvc-usuarios .
+
+#Adapta los flujos para la compilacion Jar
+RUN sed -i 's/\r$//' mvnw
+#Genrando el Jar
+RUN ./mvnw clean package -DskipTests
+
+#Puerto del microservicio
+EXPOSE 8000
+
+#Levantar el contenedor - Punto de entrada - Codigo CMD cpara levanta la APP
+ENTRYPOINT ["java", "-jar", "./target/msvc-usuarios-0.0.1-SNAPSHOT.jar"]
