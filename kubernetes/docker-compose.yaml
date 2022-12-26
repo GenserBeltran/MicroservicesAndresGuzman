@@ -1,0 +1,71 @@
+version: "3.9"
+services:
+
+  mysql-aguzman:
+    container_name: mysql-aguzman
+    image: mysql:latest
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: sasa
+      MYSQL_DATABASE: msvc_usuarios
+    volumes:
+      - d-mysql-g-usuario:/var/lib/mysql
+    networks:
+     - spring
+#    restart: always
+
+  postgre-aguzman:
+    container_name: postgre-aguzman
+    image: postgres:latest
+    ports:
+      - "5532:5432"
+    environment:
+      POSTGRES_PASSWORD: sasa
+      POSTGRES_DB: msvc_cursos
+    volumes:
+      - d-postgres-g-curso:/var/lib/postgresql/data
+    networks:
+     - spring
+#    restart: always
+
+  msvc-usuarios:
+    container_name: msvc-usuarios
+    image: enginedigitalcolombia/usuarios:latest
+#    build:
+#      context: ./
+      #target: usuario
+#      dockerfile: ./msvc-usuarios/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: ./msvc-usuarios/.env
+    depends_on:
+      - mysql-aguzman
+    networks:
+      - spring
+#    restart: always
+
+  msvc-curso:
+    container_name: msvc-curso
+    image: enginedigitalcolombia/curso:latest
+#    build:
+#      context: ./
+#      dockerfile: ./msvc-curso/Dockerfile
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgre-aguzman
+      - msvc-usuarios
+    networks:
+     - spring
+#    restart: always
+
+volumes:
+  d-mysql-g-usuario:
+    name: d-mysql-g-usuario
+  d-postgres-g-curso:
+    name: d-postgres-g-curso
+
+networks:
+  spring:
+    name: spring
